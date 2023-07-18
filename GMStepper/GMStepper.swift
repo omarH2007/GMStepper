@@ -11,7 +11,7 @@ import UIKit
 
 @IBDesignable public class GMStepper: UIControl, UITextFieldDelegate {
 
-    var onReachMaxValue:(()->Void)?
+    public var onReachMaxValue:(()->Void)?
     
     /// Current value of the stepper. Defaults to 0.
     @objc @IBInspectable public var value: Double = 0 {
