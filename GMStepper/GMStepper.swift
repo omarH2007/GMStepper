@@ -6,18 +6,24 @@
 //  Copyright © 2015 Gunay Mert Karadogan. All rights reserved.
 //
 
+import Foundation
 import UIKit
 
-@IBDesignable public class GMStepper: UIControl {
+@IBDesignable public class GMStepper: UIControl, UITextFieldDelegate {
 
+    var onReachMaxValue:(()->Void)?
+    
     /// Current value of the stepper. Defaults to 0.
     @objc @IBInspectable public var value: Double = 0 {
         didSet {
-            value = min(maximumValue, max(minimumValue, value))
+            
+            if maximumValue > 0 {
+                value = min(maximumValue, max(minimumValue, value))
+            }
+            
+            label.text = formattedValue?.description.convertedDigitsToLocale(Locale(identifier: "EN"))
 
-            label.text = formattedValue
-
-            if oldValue != value {
+            if oldValue != value || maximumValue == 0 {
                 sendActions(for: .valueChanged)
             }
         }
@@ -44,7 +50,7 @@ import UIKit
     }
 
     /// Maximum value. Must be more than minimumValue. Defaults to 100.
-    @objc @IBInspectable public var maximumValue: Double = 100 {
+    @objc @IBInspectable public var maximumValue: Double = 0 {
         didSet {
             value = min(maximumValue, max(minimumValue, value))
         }
@@ -212,22 +218,45 @@ import UIKit
         return button
     }()
 
-    lazy var label: UILabel = {
-        let label = UILabel()
+    lazy var label: UITextField = {
+        let label = UITextField()
         label.textAlignment = .center
         label.text = formattedValue
         label.textColor = self.labelTextColor
         label.backgroundColor = self.labelBackgroundColor
-        label.font = self.labelFont
+        label.font = UIFont.systemFont(ofSize: 16)
         label.layer.cornerRadius = self.labelCornerRadius
         label.layer.masksToBounds = true
         label.isUserInteractionEnabled = true
         let panRecognizer = UIPanGestureRecognizer(target: self, action: #selector(GMStepper.handlePan))
         panRecognizer.maximumNumberOfTouches = 1
         label.addGestureRecognizer(panRecognizer)
+        if #available(iOS 10.0, *) {
+            label.keyboardType = .asciiCapableNumberPad
+        } else {
+            // Fallback on earlier versions
+        }
+        label.delegate = self
         return label
     }()
-
+    
+    
+    var font:UIFont  = UIFont.systemFont(ofSize: 16) {
+        didSet {
+            label.font = font
+        }
+    }
+    
+    public func textFieldDidEndEditing(_ textField: UITextField) {
+        let oldValue = self.value
+        if let text = textField.text, !text.isEmpty,
+            let quantity = Double(text), quantity != oldValue {
+            self.value = quantity <= 0 ? 1.0 : quantity
+        } else {
+            textField.text = Int(oldValue).description
+        }
+    }
+    
     var labelOriginalCenter: CGPoint!
     var labelMaximumCenterX: CGFloat!
     var labelMinimumCenterX: CGFloat!
@@ -341,18 +370,7 @@ import UIKit
         NotificationCenter.default.removeObserver(self)
     }
 
-    /// Useful closure for logging the timer interval. You can call this in the timer handler to test the autorepeat option. Not used in the current implementation.
-//    lazy var printTimerGaps: () -> () = {
-//        var prevTime: CFAbsoluteTime?
-//
-//        return { _ in
-//            var now = CFAbsoluteTimeGetCurrent()
-//            if let prevTime = prevTime {
-//                print(now - prevTime)
-//            }
-//            prevTime = now
-//        }
-//    }()
+
 }
 
 // MARK: Pan Gesture
@@ -447,6 +465,7 @@ extension GMStepper {
 
         if value == maximumValue {
             animateLimitHitIfNeeded()
+            self.onReachMaxValue?()
         } else {
             stepperState = .ShouldIncrease
             animateSlideRight()
@@ -523,5 +542,31 @@ extension GMStepper {
 extension Decimal {
     var significantFractionalDecimalDigits: Int {
         return max(-exponent, 0)
+    }
+}
+
+extension String {
+    private static let formatter = NumberFormatter()
+
+    func clippingCharacters(in characterSet: CharacterSet) -> String {
+        components(separatedBy: characterSet).joined()
+    }
+
+    func convertedDigitsToLocale(_ locale: Locale = .current) -> String {
+        let digits = Set(clippingCharacters(in: CharacterSet.decimalDigits.inverted))
+        guard !digits.isEmpty else { return self }
+
+        Self.formatter.locale = locale
+
+        let maps: [(original: String, converted: String)] = digits.map {
+            let original = String($0)
+            let digit = Self.formatter.number(from: original)!
+            let localized = Self.formatter.string(from: digit)!
+            return (original, localized)
+        }
+
+        return maps.reduce(self) { converted, map in
+            converted.replacingOccurrences(of: map.original, with: map.converted)
+        }
     }
 }
