@@ -23,9 +23,6 @@ import UIKit
             
             label.text = formattedValue?.description.convertedDigitsToLocale(Locale(identifier: "EN"))
 
-            if oldValue != value || maximumValue == 0 {
-                sendActions(for: .valueChanged)
-            }
         }
     }
     
@@ -359,8 +356,10 @@ import UIKit
     func updateValue() {
         if stepperState == .ShouldIncrease {
             value += stepValue
+            sendActions(for: .valueChanged)
         } else if stepperState == .ShouldDecrease {
             value -= stepValue
+            sendActions(for: .valueChanged)
         }
     }
     
