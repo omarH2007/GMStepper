@@ -22,7 +22,7 @@ import UIKit
             }
             
             label.text = formattedValue?.description.convertedDigitsToLocale(Locale(identifier: "EN"))
-
+           
         }
     }
     
@@ -249,6 +249,7 @@ import UIKit
         if let text = textField.text, !text.isEmpty,
             let quantity = Double(text), quantity != oldValue {
             self.value = quantity <= 0 ? 1.0 : quantity
+            sendActions(for: .valueChanged)
         } else {
             textField.text = Int(oldValue).description
         }
