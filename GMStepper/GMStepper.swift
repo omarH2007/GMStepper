@@ -28,7 +28,7 @@ import UIKit
             }
             
             label.text = formattedValue?.description.convertedDigitsToLocale(Locale(identifier: "EN"))
-            
+            leftButtonUpdateInterActions()
         }
     }
     
@@ -126,6 +126,9 @@ import UIKit
             label.textColor = labelTextColor
         }
     }
+    
+    /// Text color of the middle label. Defaults to white.
+    @objc @IBInspectable public var disableColor: UIColor = UIColor.black
     
     /// Text color of the middle label. Defaults to lighter blue.
     @objc @IBInspectable public var labelBackgroundColor: UIColor = UIColor(red:0.26, green:0.6, blue:0.87, alpha:1) {
@@ -334,7 +337,7 @@ import UIKit
         self.viewStyle = type
         setup()
     }
-   
+    
     
     fileprivate func setup() {
         addSubview(leftButton)
@@ -344,7 +347,7 @@ import UIKit
         if viewStyle == .normal {
             backgroundColor = buttonsBackgroundColor
         }
-      
+        
         switch viewStyle {
         case .normal:
             layer.cornerRadius = cornerRadius
@@ -355,7 +358,7 @@ import UIKit
             rightButton.layer.cornerRadius = cornerRadius
             rightButton.clipsToBounds = true
         }
-     
+        
         labelOriginalCenter = label.center
         
         setupNumberFormatter()
@@ -400,7 +403,12 @@ import UIKit
         NotificationCenter.default.removeObserver(self)
     }
     
-    
+    func leftButtonUpdateInterActions(){
+        guard viewStyle == .productDetailDefaultStyle else{return}
+        leftButton.isEnabled = value > 1
+        leftButton.alpha = value <= 1 ? 0.6 : 1.0
+        leftButton.isUserInteractionEnabled = value > 1
+    }
 }
 
 // MARK: Pan Gesture
