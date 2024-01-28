@@ -337,7 +337,7 @@ import UIKit
         self.viewStyle = type
         setup()
     }
-    
+   
     
     fileprivate func setup() {
         addSubview(leftButton)
@@ -347,7 +347,7 @@ import UIKit
         if viewStyle == .normal {
             backgroundColor = buttonsBackgroundColor
         }
-        
+      
         switch viewStyle {
         case .normal:
             layer.cornerRadius = cornerRadius
@@ -358,7 +358,7 @@ import UIKit
             rightButton.layer.cornerRadius = cornerRadius
             rightButton.clipsToBounds = true
         }
-        
+     
         labelOriginalCenter = label.center
         
         setupNumberFormatter()
@@ -406,7 +406,7 @@ import UIKit
     func leftButtonUpdateInterActions(){
         guard viewStyle == .productDetailDefaultStyle else{return}
         leftButton.isEnabled = value > 1
-        leftButton.alpha = value <= 1 ? 0.6 : 1.0
+        leftButton.setTitleColor(value > 1 ? self.buttonsTextColor:disableColor, for: .normal)
         leftButton.isUserInteractionEnabled = value > 1
     }
 }
