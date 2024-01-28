@@ -405,7 +405,6 @@ import UIKit
     
     func leftButtonUpdateInterActions(){
         guard viewStyle == .productDetailDefaultStyle else{return}
-        leftButton.isEnabled = value > 1
         leftButton.setTitleColor(value > 1 ? self.buttonsTextColor:disableColor, for: .normal)
         leftButton.isUserInteractionEnabled = value > 1
     }
