@@ -29,6 +29,7 @@ import UIKit
             
             label.text = formattedValue?.description.convertedDigitsToLocale(Locale(identifier: "EN"))
             leftButtonUpdateInterActions()
+            rightButtonUpdateInterActions()
         }
     }
     
@@ -407,6 +408,13 @@ import UIKit
         guard viewStyle == .productDetailDefaultStyle else{return}
         leftButton.setTitleColor(value > 1 ? self.buttonsTextColor:disableColor, for: .normal)
         leftButton.isUserInteractionEnabled = value > 1
+    }
+    
+    func rightButtonUpdateInterActions(){
+        guard viewStyle == .productDetailDefaultStyle else{return}
+        let isOutOfStack = value == 0 && value == maximumValue
+        rightButton.setTitleColor(!isOutOfStack ? self.buttonsTextColor:disableColor, for: .normal)
+        rightButton.isUserInteractionEnabled = !isOutOfStack
     }
 }
 
