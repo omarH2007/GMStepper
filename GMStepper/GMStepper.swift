@@ -244,15 +244,7 @@ import UIKit
         label.font = UIFont.systemFont(ofSize: 16)
         label.layer.cornerRadius = self.labelCornerRadius
         label.layer.masksToBounds = true
-        label.isUserInteractionEnabled = true
-        let panRecognizer = UIPanGestureRecognizer(target: self, action: #selector(GMStepper.handlePan))
-        panRecognizer.maximumNumberOfTouches = 1
-        label.addGestureRecognizer(panRecognizer)
-        if #available(iOS 10.0, *) {
-            label.keyboardType = .asciiCapableNumberPad
-        } else {
-            // Fallback on earlier versions
-        }
+        label.isUserInteractionEnabled = false
         label.delegate = self
         return label
     }()
@@ -477,7 +469,6 @@ extension GMStepper {
         
         leftButton.isEnabled = true
         rightButton.isEnabled = true
-        label.isUserInteractionEnabled = true
         
         UIView.animate(withDuration: self.labelSlideDuration, animations: {
             self.label.center = self.labelOriginalCenter
