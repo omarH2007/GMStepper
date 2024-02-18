@@ -404,7 +404,7 @@ import UIKit
     
     func rightButtonUpdateInterActions(){
         guard viewStyle == .productDetailDefaultStyle else{return}
-        let isOutOfStack = value == 0 && value == maximumValue
+        let isOutOfStack = (value == 0 && value == maximumValue) || (value == maximumValue)
         rightButton.setTitleColor(!isOutOfStack ? self.buttonsTextColor:disableColor, for: .normal)
         rightButton.isUserInteractionEnabled = !isOutOfStack
     }
