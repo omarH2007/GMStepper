@@ -16,7 +16,9 @@ import UIKit
     
     @objc public enum ViewStyle : Int{
         case normal = 0
-        case productDetailDefaultStyle = 1
+        case new
+        case newInteractive
+        case normalInteractive
     }
     
     /// Current value of the stepper. Defaults to 0.
@@ -106,7 +108,7 @@ import UIKit
             for button in [leftButton, rightButton] {
                 button.backgroundColor = buttonsBackgroundColor
             }
-            if viewStyle == .normal {
+            if viewStyle == .normal || viewStyle == .normalInteractive   {
                 backgroundColor = buttonsBackgroundColor
             }
         }
@@ -244,8 +246,22 @@ import UIKit
         label.font = UIFont.systemFont(ofSize: 16)
         label.layer.cornerRadius = self.labelCornerRadius
         label.layer.masksToBounds = true
-        label.isUserInteractionEnabled = false
+        label.isUserInteractionEnabled = viewStyle == .newInteractive || viewStyle == .normalInteractive
         label.delegate = self
+        switch viewStyle {
+        case .newInteractive,.normalInteractive:
+            let panRecognizer = UIPanGestureRecognizer(target: self, action: #selector(GMStepper.handlePan))
+            panRecognizer.maximumNumberOfTouches = 1
+            label.addGestureRecognizer(panRecognizer)
+            if #available(iOS 10.0, *) {
+                label.keyboardType = .asciiCapableNumberPad
+            } else {
+                // Fallback on earlier versions
+            }
+
+        default:break
+        }
+  
         return label
     }()
     
@@ -337,15 +353,15 @@ import UIKit
         addSubview(rightButton)
         addSubview(label)
         
-        if viewStyle == .normal {
+        if viewStyle == .normal || viewStyle == .normalInteractive {
             backgroundColor = buttonsBackgroundColor
         }
       
         switch viewStyle {
-        case .normal:
+        case .normal,.normalInteractive:
             layer.cornerRadius = cornerRadius
             clipsToBounds = true
-        case .productDetailDefaultStyle:
+        case .new,.newInteractive:
             leftButton.layer.cornerRadius = cornerRadius
             leftButton.clipsToBounds = true
             rightButton.layer.cornerRadius = cornerRadius
@@ -397,13 +413,13 @@ import UIKit
     }
     
     func leftButtonUpdateInterActions(){
-        guard viewStyle == .productDetailDefaultStyle else{return}
+        guard viewStyle == .new || viewStyle == .newInteractive else{return}
         leftButton.setTitleColor(value > 1 ? self.buttonsTextColor:disableColor, for: .normal)
         leftButton.isUserInteractionEnabled = value > 1
     }
     
     func rightButtonUpdateInterActions(){
-        guard viewStyle == .productDetailDefaultStyle else{return}
+        guard viewStyle == .new || viewStyle == .newInteractive else{return}
         let isOutOfStack = (value == 0 && value == maximumValue) || (value == maximumValue)
         rightButton.setTitleColor(!isOutOfStack ? self.buttonsTextColor:disableColor, for: .normal)
         rightButton.isUserInteractionEnabled = !isOutOfStack
@@ -469,7 +485,8 @@ extension GMStepper {
         
         leftButton.isEnabled = true
         rightButton.isEnabled = true
-        
+        label.isUserInteractionEnabled = viewStyle == .newInteractive || viewStyle == .normalInteractive
+
         UIView.animate(withDuration: self.labelSlideDuration, animations: {
             self.label.center = self.labelOriginalCenter
             self.rightButton.backgroundColor = self.buttonsBackgroundColor
