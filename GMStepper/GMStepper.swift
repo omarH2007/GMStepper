@@ -250,15 +250,11 @@ import UIKit
         label.delegate = self
         switch viewStyle {
         case .newInteractive,.normalInteractive:
-            let panRecognizer = UIPanGestureRecognizer(target: self, action: #selector(GMStepper.handlePan))
-            panRecognizer.maximumNumberOfTouches = 1
-            label.addGestureRecognizer(panRecognizer)
             if #available(iOS 10.0, *) {
                 label.keyboardType = .asciiCapableNumberPad
             } else {
                 // Fallback on earlier versions
             }
-
         default:break
         }
   
@@ -277,7 +273,11 @@ import UIKit
         if let text = textField.text, !text.isEmpty,
            let quantity = Double(text), quantity != oldValue {
             self.value = quantity <= 0 ? 1.0 : quantity
-            sendActions(for: .valueChanged)
+            if value >= maximumValue {
+                self.onReachMaxValue?()
+            } else {
+                sendActions(for: .valueChanged)
+            }
         } else {
             textField.text = Int(oldValue).description
         }
