@@ -174,7 +174,12 @@ import UIKit
     @objc @IBInspectable public var borderWidth: CGFloat = 0.0 {
         didSet {
             layer.borderWidth = borderWidth
-            label.layer.borderWidth = borderWidth
+            switch viewStyle {
+            case .new,.newInteractive:
+                break
+            default:
+                label.layer.borderWidth = borderWidth
+            }
         }
     }
     
@@ -182,7 +187,12 @@ import UIKit
     @objc @IBInspectable public var borderColor: UIColor = UIColor.clear {
         didSet {
             layer.borderColor = borderColor.cgColor
-            label.layer.borderColor = borderColor.cgColor
+            switch viewStyle {
+            case .new,.newInteractive:
+                break
+            default:
+                label.layer.borderColor = borderColor.cgColor
+            }
         }
     }
     
