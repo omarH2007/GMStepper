@@ -247,7 +247,7 @@ import UIKit
         return button
     }()
     
-    lazy var label: UITextField = {
+    public lazy var label: UITextField = {
         let label = UITextField()
         label.textAlignment = .center
         label.text = formattedValue
