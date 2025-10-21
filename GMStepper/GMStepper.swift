@@ -9,6 +9,15 @@
 import Foundation
 import UIKit
 
+public class CenteredTextField: UITextField {
+    public override func textRect(forBounds bounds: CGRect) -> CGRect {
+        return bounds
+    }
+    
+    public  override func editingRect(forBounds bounds: CGRect) -> CGRect {
+        return bounds
+    }
+}
 @IBDesignable public class GMStepper: UIControl, UITextFieldDelegate {
     
     public var onReachMaxValue:(()->Void)?
@@ -247,8 +256,8 @@ import UIKit
         return button
     }()
     
-    public lazy var label: UITextField = {
-        let label = UITextField()
+    public lazy var label: CenteredTextField = {
+        let label = CenteredTextField()
         label.textAlignment = .center
         label.text = formattedValue
         label.textColor = self.labelTextColor
@@ -258,6 +267,8 @@ import UIKit
         label.layer.masksToBounds = true
         label.isUserInteractionEnabled = viewStyle == .newInteractive || viewStyle == .normalInteractive
         label.delegate = self
+        label.leftView = nil
+        label.rightView = nil
         switch viewStyle {
         case .newInteractive,.normalInteractive:
             if #available(iOS 10.0, *) {
